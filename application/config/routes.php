@@ -51,5 +51,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $route['default_controller'] = 'taxiweb';
 $route['test'] = 'taxiweb/test';
+$route['api'] = 'taxiweb/api';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

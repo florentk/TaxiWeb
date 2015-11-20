@@ -75,6 +75,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script src="<?php echo base_url("assets/js/bootstrap.min.js"); ?>"></script>
     <script src="<?php echo base_url("assets/js/bootstrap-switch.js"); ?>"></script>
     <script>
+
+    function updatePos(position) {
+       alert(position.coords.latitude + " " + position.coords.longitude);
+    }
+
+    function requestPos(argument){
+      navigator.geolocation.getCurrentPosition(updatePos);
+    }
+
+    // One-shot position request.
+    //setInterval(requestPos,10000);
+    requestPos("");
+
     $(function(argument) {
       $('[type="checkbox"]').bootstrapSwitch();
     })
