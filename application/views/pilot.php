@@ -77,7 +77,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script>
 
     function updatePos(position) {
-       alert(position.coords.latitude + " " + position.coords.longitude);
+      $.post("index.php/api",{req : JSON.stringify({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude}) });
     }
 
     function requestPos(argument){
@@ -85,8 +85,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     }
 
     // One-shot position request.
-    //setInterval(requestPos,10000);
-    requestPos("");
+    setInterval(requestPos,10000);
+    //requestPos("");
 
     $(function(argument) {
       $('[type="checkbox"]').bootstrapSwitch();
