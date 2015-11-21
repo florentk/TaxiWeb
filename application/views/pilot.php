@@ -22,29 +22,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <h2 class="h4">Course courantes</h2>
           <div class="input-group">
           <p>         
-            <label>Client :</label> <input id="client" type="text" class="form-control" value="<?php echo $current_journey->client; ?>"></input>
+            <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
           </p>
           </div>
           <div class="input-group">
           <p>
-            <label>Heure :</label> <input id="heure" type="text" class="form-control" value="<?php echo date_format(date_create($current_journey->start_time), 'H:i'); ?>"></input>
+            <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input>
           </p>    
         </div>
           <div class="input-group">
           <p>       
-            <label>Depart :</label> <input id="depart" type="text"  class="form-control" value="<?php echo $current_journey->start; ?>"></input>
+            <label>Depart :</label> <input id="depart" type="text"  class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
           </p>  
         </div>
           <div class="input-group">
           <p>          
-            <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" value="<?php echo $current_journey->destination; ?>"></input>
+            <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->destination."\"";  ?>"></input>
           </p>   
           </div>
 
           <div>
           <p>         
-            <a class="btn btn-primary bt-sm" href="#">Terminer</a>  
-            <a class="btn btn-success bt-sm" href="#">En attente</a>
+            <a class="btn btn-primary bt-sm" href="#">Terminer la course</a>  
+            <a class="btn btn-success bt-sm" href="#">Mettre en attente</a>
           </p>
           </div>
 
@@ -65,7 +65,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <h2 class="h4">Status</h2>
           <p>
              <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
-            <input id="switch-state" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
+            <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
           </p>
         </div>
       </div>
@@ -76,21 +76,30 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script src="<?php echo base_url("assets/js/bootstrap-switch.js"); ?>"></script>
     <script>
 
+    function api(jreq) {
+      $.post("index.php/api",{req : JSON.stringify(jreq) });
+    }
+
     function updatePos(position) {
-      $.post("index.php/api",{req : JSON.stringify({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude}) });
+      api({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude});
     }
 
     function requestPos(argument){
       navigator.geolocation.getCurrentPosition(updatePos);
     }
 
-    // One-shot position request.
-    setInterval(requestPos,10000);
-    //requestPos("");
+    var switchdispo = $('input#switch-dispo');
 
     $(function(argument) {
-      $('[type="checkbox"]').bootstrapSwitch();
+      switchdispo.bootstrapSwitch();
     })
+
+    switchdispo.on('switchChange.bootstrapSwitch', function(event, state) {
+      api({"f" : "setPilotState", "state": state ? "2" : "1"});
+    });
+
+    setInterval(requestPos,10000);
+
     </script>
   </body>
 </html>

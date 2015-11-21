@@ -46,12 +46,56 @@ class Taxiweb extends CI_Controller {
     }
   }
 
+  private function api_set_pilot_state($in) {
+    if(key_exists("state",$in)){
+      if($this->PilotModel->set_pilot_state($in->state))
+        $this->api_ret_ok();
+      else
+        $this->api_ret_err(12,$in);
+    }else{
+      $this->api_ret_err(11,$in);
+    }    
+  }
+
+  private function api_set_current_journey($in) {
+    if(key_exists("id",$in)){
+      if($this->PilotModel->set_current_journey($in->id))
+        $this->api_ret_ok();
+      else
+        $this->api_ret_err(12,$in);
+    }else{
+      $this->api_ret_err(11,$in);
+    }    
+  }
+
+  private function api_pending_current_journey() {
+    if($this->PilotModel->pending_current_journey())
+      $this->api_ret_ok();
+    else
+      $this->api_ret_err(12,""); 
+  }
+
+  private function api_end_current_journey() {
+    if($this->PilotModel->end_current_journey())
+      $this->api_ret_ok();
+    else
+      $this->api_ret_err(12,""); 
+  }
+
   public function api() {
     $in = json_decode($this->input->post('req'));
 
     if($in != null && key_exists("f",$in)) {
       if($in->f === "setPos") 
         $this->api_set_pos($in);
+      else if($in->f === "setPilotState") 
+        $this->api_set_pilot_state($in);
+      else if($in->f === "setCurrentJourney") 
+        $this->api_set_current_journey($in);
+      else if($in->f === "pendingCurrentJourney") 
+        $this->api_pending_current_journey();
+      else if($in->f === "endCurrentJourney") 
+        $this->api_end_current_journey();
       else  
         $this->api_ret_err(2,$in);
     }else $this->api_ret_err(1,$in);

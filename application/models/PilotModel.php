@@ -60,6 +60,24 @@ class PilotModel extends CI_Model {
     ));
   }
 
+
+   public function end_current_journey(){
+    return $this->set_current_journey_state(3);
+  }
+
+   public function pending_current_journey(){
+    return $this->set_current_journey_state(0);
+  }
+
+
+  public function set_current_journey($journey_id){
+    $this->db->where('journey_id', (int)$journey_id);
+    return $this->db->update('tw_journey', array(
+            'state' => 2
+    ));
+  }
+
+
   /*
     Private functions
   */
@@ -68,5 +86,14 @@ class PilotModel extends CI_Model {
     $this->db->where('bicycle_id', $this->id);
     return $this->db->update('tw_bicycle', $data);
   }
+  
+  private function set_current_journey_state($state){
+    $this->db->where('bicycle_id', $this->id);
+    $this->db->where('state', 2);
+    return $this->db->update('tw_journey', array(
+            'state' => $state
+    ));
+  }
+
 }
 ?>
