@@ -8,6 +8,7 @@ class Taxiweb extends CI_Controller {
     parent::__construct();
     $this->load->helper('url');
     $this->load->model('PilotModel');
+    $this->load->model('ManagerModel');
     $this->PilotModel->init(1);
   }
 
@@ -21,6 +22,12 @@ class Taxiweb extends CI_Controller {
 
 		$this->load->view('pilot',$data);
 	}
+
+	public function manager()
+	{
+    $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
+    $this->load->view('manager',$data);
+  } 
 
   private function api_ret_err($code, $debug) {
       $this->output
