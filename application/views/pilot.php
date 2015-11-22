@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 header("Cache-Control: max-age=0");
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,6 +13,12 @@ header("Cache-Control: max-age=0");
     <link href="<?php echo base_url("assets/css/highlight.css"); ?>" rel="stylesheet">
     <link href="<?php echo base_url("assets/css/bootstrap3/bootstrap-switch.css"); ?>" rel="stylesheet">
     <link href="<?php echo base_url("assets/css/main.css"); ?>" rel="stylesheet">
+
+    <?php 
+      function format_journey($j) {
+        echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start";
+      }
+     ?>
   </head>
   <body>
 
@@ -21,21 +27,16 @@ header("Cache-Control: max-age=0");
      <div class="container">
         <div class="row">
           <div class="col-sm-4 col-lg-4">
-            <h2 class="h4">Message</h2>
-
-            <div <?php if($current_journey!=null) echo "class='alert alert-success message' role='alert'" ; ?>  >
-            <?php 
-              if($current_journey!=null)  
-                echo date_format(date_create($current_journey->start_time), 'H:i')
-                      ." ".$current_journey->start
-                      ."</br><span class='glyphicon glyphicon-arrow-right'></span> "
-                      .$current_journey->destination;  
-             ?>
-            </div>
 
 
+            <h2 class="h4">Course courante</h2>
+            
+            <?php if($current_journey!=null): ?>
+              <div class="form-group">         
+                <button class="btn btn-success btn-lg" href="#" onclick="click_end_journey(false)"><?php format_journey($current_journey); ?></a>
+              </div>
+            <?php endif ?>
 
-            <h2 class="h4">Course courantes</h2>
             <div class="form-group">      
               <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
             </div>
@@ -50,31 +51,47 @@ header("Cache-Control: max-age=0");
             </div>
 
             <div class="form-group">
-              <button class="btn btn-primary bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
-              <button class="btn btn-success bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
+              <button class="btn btn-danger bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
+              <button class="btn btn-info bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
             </div>
 
           </div>
 
           <div class="col-sm-4 col-lg-4">
-            <h2 class="h4">Courses suivantes</h2>
+            <h2 class="h4">Courses à venir</h2>
 
             <?php foreach ($pending_journeys as $j): ?>
 
             <div class="form-group">         
-              <button class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start"; ?></a>
+              <button class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
             </div>
 
             <?php endforeach; ?>
 
           </div>
+
+
+          <div class="col-sm-4 col-lg-4">
+            <h2 class="h4">Courses à confirmer</h2>
+
+            <?php foreach ($request_journeys as $j): ?>
+
+            <div class="form-group">         
+              <button class="btn btn-danger btn-lg" href="#" onclick="click_confirm_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
+            </div>
+
+            <?php endforeach; ?>
+
+          </div>
+
           <div class="col-sm-4 col-lg-4">
             <h2 class="h4">Status</h2>
             <div class="form-group"> 
                <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
               <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
             </div>
-        </div>
+          </div>
+
       </div>
     </div>
 
@@ -93,6 +110,12 @@ header("Cache-Control: max-age=0");
       //TODO test field not null
       if(confirm("Commencer la course ?"))
         api({"f" : "setCurrentJourney", "id": journey_id},true);
+    }
+
+    function click_confirm_journey(journey_id) {
+      //TODO test field not null
+      if(confirm("Confirmer la course ?"))
+        api({"f" : "confirmJourney", "id": journey_id},true);
     }
 
     function click_end_journey(new_journey) {

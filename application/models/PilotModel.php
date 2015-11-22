@@ -35,6 +35,11 @@ class PilotModel extends CI_Model {
      return $query->result();
 	}
 
+	public function get_request_journeys(){		
+	   $query = $this->db->get_where('tw_pilot_view', array('bicycle_id' => $this->id, 'state' => 1));
+     return $query->result();
+	}
+
   /*
     Add functions
   */
@@ -93,6 +98,12 @@ class PilotModel extends CI_Model {
     return $this->set_current_journey_state(0);
   }
 
+  public function confirm_journey($journey_id){
+    $this->db->where('journey_id', (int)$journey_id);
+    return $this->db->update('tw_journey', array(
+            'state' => 0
+    ));
+  }
 
   public function set_current_journey($journey_id){
     $this->db->where('journey_id', (int)$journey_id);
@@ -100,6 +111,7 @@ class PilotModel extends CI_Model {
             'state' => 2
     ));
   }
+
 
 
   /*

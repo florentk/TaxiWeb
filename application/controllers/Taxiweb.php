@@ -17,6 +17,8 @@ class Taxiweb extends CI_Controller {
     $data['state'] = $this->PilotModel->get_pilot_state();
     $data['pending_journeys'] = $this->PilotModel->get_pending_journeys();
     $data['current_journey'] = $this->PilotModel->get_current_journey();
+    $data['request_journeys'] = $this->PilotModel->get_request_journeys();
+
 		$this->load->view('pilot',$data);
 	}
 
@@ -85,6 +87,17 @@ class Taxiweb extends CI_Controller {
     }    
   }
 
+  private function api_confirm_journey($in) {
+    if(key_exists("id",$in)){
+      if($this->PilotModel->confirm_journey($in->id) )
+        $this->api_ret_ok();
+      else
+        $this->api_ret_err(12,$in);
+    }else{
+      $this->api_ret_err(11,$in);
+    }    
+  }
+
   private function api_pending_current_journey() {
     if($this->PilotModel->pending_current_journey() 
     && $this->PilotModel->set_pilot_state(1))
@@ -101,6 +114,7 @@ class Taxiweb extends CI_Controller {
       $this->api_ret_err(12,""); 
   }
 
+
   public function api() {
     $in = json_decode($this->input->post('req'));
 
@@ -109,6 +123,8 @@ class Taxiweb extends CI_Controller {
         $this->api_set_pos($in);
       else if($in->f === "setPilotState") 
         $this->api_set_pilot_state($in);
+      else if($in->f === "confirmJourney") 
+        $this->api_confirm_journey($in);
       else if($in->f === "setCurrentJourney") 
         $this->api_set_current_journey($in);
       else if($in->f === "pendingCurrentJourney") 
