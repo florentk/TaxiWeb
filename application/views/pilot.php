@@ -19,54 +19,45 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="row">
           <div class="col-sm-4 col-lg-4">
 
-          <h2 class="h4">Course courantes</h2>
-          <div class="input-group">
-          <p>         
-            <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
-          </p>
+            <h2 class="h4">Course courantes</h2>
+            <div class="form-group">      
+              <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
+            </div>
+            <div class="form-group">
+              <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input> 
           </div>
-          <div class="input-group">
-          <p>
-            <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input>
-          </p>    
-        </div>
-          <div class="input-group">
-          <p>       
-            <label>Depart :</label> <input id="depart" type="text"  class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
-          </p>  
-        </div>
-          <div class="input-group">
-          <p>          
-            <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->destination."\"";  ?>"></input>
-          </p>   
+            <div class="form-group">  
+              <label>Depart :</label> <input id="depart" type="text"  class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
+          </div>
+            <div class="form-group">       
+              <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->destination."\"";  ?>"></input>
+            </div>
+
+            <div class="form-group">
+              <a class="btn btn-primary bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</a>  
+              <a class="btn btn-success bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</a>
+            </div>
+
           </div>
 
-          <div>
-          <p>         
-            <a class="btn btn-primary bt-sm" href="#">Terminer la course</a>  
-            <a class="btn btn-success bt-sm" href="#">Mettre en attente</a>
-          </p>
-          </div>
+          <div class="col-sm-4 col-lg-4">
+            <h2 class="h4">Courses suivantes</h2>
+
+            <?php foreach ($pending_journeys as $j): ?>
+
+            <p>         
+              <a class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start"; ?></a>
+            </p>
+
+            <?php endforeach; ?>
 
           </div>
           <div class="col-sm-4 col-lg-4">
-          <h2 class="h4">Courses suivantes</h2>
-
-          <?php foreach ($pending_journeys as $j): ?>
-
-          <p>         
-            <a class="btn btn-info btn-lg" href="#"><?php echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start"; ?></a>
-          </p>
-
-          <?php endforeach; ?>
-
-          </div>
-          <div class="col-sm-4 col-lg-4">
-          <h2 class="h4">Status</h2>
-          <p>
-             <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
-            <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
-          </p>
+            <h2 class="h4">Status</h2>
+            <p>
+               <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
+              <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
+            </p>
         </div>
       </div>
     </div>
@@ -76,17 +67,46 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <script src="<?php echo base_url("assets/js/bootstrap-switch.js"); ?>"></script>
     <script>
 
-    function api(jreq) {
-      $.post("index.php/api",{req : JSON.stringify(jreq) });
+    function api(jreq,reload) {
+      $.post("index.php/api",{req : JSON.stringify(jreq) }, function(data, status){
+        if(reload) location.reload();
+      });
+    }
+
+    function click_journey(journey_id) {
+      //TODO ask confirm if fields not empty
+      api({"f" : "setCurrentJourney", "id": journey_id},true);
+    }
+
+    function click_end_journey(new_journey) {
+      //TODO ask confirm
+      if(new_journey) 
+        location.reload();    
+      else  
+        api({"f" : "endCurrentJourney"},true);
+    }
+
+    function click_pending_journey(new_journey) {
+      if(new_journey)
+        api({"f" : "addJourney", 
+             "customer_name" : $('input#client').val(), 
+             "start_addr" : $('input#depart').val(), 
+             "destination_addr" : $('input#arrivee').val(), 
+             "start_time" : $('input#heure').val()
+        },true);
+      else
+        api({"f" : "pendingCurrentJourney"},true);
     }
 
     function updatePos(position) {
-      api({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude});
+      api({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude},false);
     }
 
     function requestPos(argument){
       navigator.geolocation.getCurrentPosition(updatePos);
     }
+
+    //TODO on field focus exit => save field in bicyle "note"
 
     var switchdispo = $('input#switch-dispo');
 
@@ -95,7 +115,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     })
 
     switchdispo.on('switchChange.bootstrapSwitch', function(event, state) {
-      api({"f" : "setPilotState", "state": state ? "2" : "1"});
+      //TODO disable text fields if busy enable else
+      api({"f" : "setPilotState", "state": state ? "2" : "1"},false);
     });
 
     setInterval(requestPos,10000);
