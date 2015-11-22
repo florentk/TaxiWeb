@@ -26,6 +26,12 @@ class Taxiweb extends CI_Controller {
 	public function manager()
 	{
     $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
+
+    $data['unaffected_journeys'] = $this->ManagerModel->get_unaffected_journeys();
+    $data['pending_journeys'] = $this->ManagerModel->get_pending_journeys();
+    $data['inprogress_journeys'] = $this->ManagerModel->get_inprogress_journeys();
+    $data['request_journeys'] = $this->ManagerModel->get_request_journeys();
+
     $this->load->view('manager',$data);
   } 
 
