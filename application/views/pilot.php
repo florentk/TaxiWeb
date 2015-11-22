@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+header("Cache-Control: max-age=0");
 ?><!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,9 +16,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   </head>
   <body>
 
+
+
      <div class="container">
         <div class="row">
           <div class="col-sm-4 col-lg-4">
+            <h2 class="h4">Message</h2>
+
+            <div <?php if($current_journey!=null) echo "class='alert alert-success message' role='alert'" ; ?>  >
+            <?php 
+              if($current_journey!=null)  
+                echo date_format(date_create($current_journey->start_time), 'H:i')
+                      ." ".$current_journey->start
+                      ."</br><span class='glyphicon glyphicon-arrow-right'></span> "
+                      .$current_journey->destination;  
+             ?>
+            </div>
+
+
 
             <h2 class="h4">Course courantes</h2>
             <div class="form-group">      
@@ -34,8 +50,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
 
             <div class="form-group">
-              <a class="btn btn-primary bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</a>  
-              <a class="btn btn-success bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</a>
+              <button class="btn btn-primary bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
+              <button class="btn btn-success bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
             </div>
 
           </div>
@@ -45,19 +61,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <?php foreach ($pending_journeys as $j): ?>
 
-            <p>         
-              <a class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start"; ?></a>
-            </p>
+            <div class="form-group">         
+              <button class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php echo date_format(date_create($j->start_time), 'H:i')." $j->client $j->start"; ?></a>
+            </div>
 
             <?php endforeach; ?>
 
           </div>
           <div class="col-sm-4 col-lg-4">
             <h2 class="h4">Status</h2>
-            <p>
+            <div class="form-group"> 
                <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
               <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
-            </p>
+            </div>
         </div>
       </div>
     </div>
@@ -69,21 +85,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     function api(jreq,reload) {
       $.post("index.php/api",{req : JSON.stringify(jreq) }, function(data, status){
-        if(reload) location.reload();
+        if(reload) location.reload(true);
       });
     }
 
     function click_journey(journey_id) {
-      //TODO ask confirm if fields not empty
-      api({"f" : "setCurrentJourney", "id": journey_id},true);
+      //TODO test field not null
+      if(confirm("Commencer la course ?"))
+        api({"f" : "setCurrentJourney", "id": journey_id},true);
     }
 
     function click_end_journey(new_journey) {
-      //TODO ask confirm
-      if(new_journey) 
-        location.reload();    
-      else  
-        api({"f" : "endCurrentJourney"},true);
+      if(confirm("Terminer la course ?")){
+        if(new_journey) 
+          location.reload(true);    
+        else  
+          api({"f" : "endCurrentJourney"},true);
+      }
     }
 
     function click_pending_journey(new_journey) {
@@ -98,13 +116,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         api({"f" : "pendingCurrentJourney"},true);
     }
 
-    function updatePos(position) {
-      api({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude},false);
-    }
+    
 
-    function requestPos(argument){
-      navigator.geolocation.getCurrentPosition(updatePos);
-    }
+    function updatePos(){
+      navigator.geolocation.getCurrentPosition(function(position) {
+        api({"f" : "setPos", "lat": position.coords.latitude,"long" : position.coords.longitude},false);
+    });}
 
     //TODO on field focus exit => save field in bicyle "note"
 
@@ -119,8 +136,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       api({"f" : "setPilotState", "state": state ? "2" : "1"},false);
     });
 
-    setInterval(requestPos,10000);
+    updatePos();
+    setInterval(updatePos,30000);
 
     </script>
   </body>
+  <footer>
+     <div class="container">
+   <p>Created by <a href="http://lille.bike">LILLE.BIKE <span class='glyphicon glyphicon-registration-mark'></span></a></p>
+
+
+    </div>
+  </footer>
 </html>
