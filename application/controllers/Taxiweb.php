@@ -35,6 +35,12 @@ class Taxiweb extends CI_Controller {
     $this->load->view('manager',$data);
   } 
 
+  public function history()
+  {
+    $data['history'] = $this->ManagerModel->get_ended_journeys();
+    $this->load->view('history',$data);
+  }
+
   private function api_ret_err($code, $debug) {
       $this->output
               ->set_content_type('application/json')
