@@ -51,8 +51,8 @@ header("Cache-Control: max-age=0");
             </div>
 
             <div class="form-group">
-              <button class="btn btn-danger bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
-              <button class="btn btn-info bt-sm"  href="#" onclick="click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
+              <button class="btn btn-danger bt-sm"  href="#" onclick="event.target.disabled=true;click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
+              <button class="btn btn-info bt-sm"  href="#" onclick="event.target.disabled=true;click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
             </div>
 
           </div>
@@ -63,7 +63,7 @@ header("Cache-Control: max-age=0");
             <?php foreach ($pending_journeys as $j): ?>
 
             <div class="form-group">         
-              <button class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
+              <button class="btn btn-info btn-lg" href="#" onclick="event.target.disabled=true;click_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
             </div>
 
             <?php endforeach; ?>
@@ -77,7 +77,7 @@ header("Cache-Control: max-age=0");
             <?php foreach ($request_journeys as $j): ?>
 
             <div class="form-group">         
-              <button class="btn btn-danger btn-lg" href="#" onclick="click_confirm_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
+              <button class="btn btn-danger btn-lg" href="#" onclick="event.target.disabled=true;click_confirm_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
             </div>
 
             <?php endforeach; ?>
