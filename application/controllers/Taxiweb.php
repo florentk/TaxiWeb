@@ -9,37 +9,74 @@ class Taxiweb extends CI_Controller {
     $this->load->helper('url');
     $this->load->model('PilotModel');
     $this->load->model('ManagerModel');
+    $this->load->library('Mobile_Detect');
+
     $this->PilotModel->init(1);
   }
 
 	public function index()
 	{
+    $data['title'] = 'florent';
     $data['name'] = 'florent';
     $data['state'] = $this->PilotModel->get_pilot_state();
     $data['pending_journeys'] = $this->PilotModel->get_pending_journeys();
     $data['current_journey'] = $this->PilotModel->get_current_journey();
     $data['request_journeys'] = $this->PilotModel->get_request_journeys();
 
+		$this->load->view('templates/header',$data);
 		$this->load->view('pilot',$data);
+		$this->load->view('templates/footer');
 	}
 
-	public function manager()
+	private function manager_full($data)
 	{
+    $data['title'] = 'Manager';
     $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
+    $date_add_journey['prefix_class'] = "modal";
 
+		$this->load->view('templates/header',$data);
+    $this->load->view('manager/bicycles',$data);
+    $this->load->view('manager/journeys',$data);
+    $this->load->view('manager/add_journeys',$date_add_journey);
+		$this->load->view('templates/footer');
+  } 
+
+
+	private function manager_mini($data)
+	{
+    $data['title'] = 'Ajouter une course';
+    $date_add_journey['prefix_class'] = "form";
+
+		$this->load->view('templates/header',$data);
+    $this->load->view('manager/add_journeys',$date_add_journey);
+    $this->load->view('manager/journeys',$data);
+		$this->load->view('templates/footer');
+  } 
+
+  public function manager(){
+    $this->detect = new Mobile_Detect;
     $data['unaffected_journeys'] = $this->ManagerModel->get_unaffected_journeys();
     $data['pending_journeys'] = $this->ManagerModel->get_pending_journeys();
     $data['inprogress_journeys'] = $this->ManagerModel->get_inprogress_journeys();
     $data['request_journeys'] = $this->ManagerModel->get_request_journeys();
 
-    $this->load->view('manager',$data);
-  } 
+    if ( $this->mobile_detect->isMobile() ) 
+     $this->manager_mini($data);
+    else
+     $this->manager_full($data);
+  }
 
   public function history()
   {
+    $data['title'] = 'History';
     $data['history'] = $this->ManagerModel->get_ended_journeys();
+
+		$this->load->view('templates/header',$data);
     $this->load->view('history',$data);
+		$this->load->view('templates/footer');
   }
+
+
 
   private function api_ret_err($code, $debug) {
       $this->output
