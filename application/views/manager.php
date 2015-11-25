@@ -45,7 +45,10 @@ header("Cache-Control: max-age=0");
           </div>
         </div>
     </div>
-
+    <div class="container">
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addJourney">Ajouter course ...</button>
+        <a class="btn btn-info btn-lg"  href="history">Historique</a>
+    </div>
     <div class="container">
         <div class="row">
 
@@ -53,7 +56,7 @@ header("Cache-Control: max-age=0");
           <h2 class="h4">Courses non affectées</h2>
           <?php foreach ($unaffected_journeys as $j): ?>
             <div class="form-group">         
-              <button class="btn btn-primary btn-lg" href="#" ><?php format_journey($j); ?></a>
+              <button class="btn btn-primary btn-default" href="#" ><?php format_journey($j); ?></a>
             </div>
           <?php endforeach; ?>
           </div>
@@ -62,7 +65,7 @@ header("Cache-Control: max-age=0");
           <h2 class="h4">Courses à confirmer</h2>
           <?php foreach ($request_journeys as $j): ?>
             <div class="form-group">         
-              <button class="btn btn-danger btn-lg" href="#" ><?php format_journey($j); ?></a>
+              <button class="btn btn-danger btn-default" href="#" ><?php format_journey($j); ?></a>
             </div>
           <?php endforeach; ?>
           </div>
@@ -71,7 +74,7 @@ header("Cache-Control: max-age=0");
           <h2 class="h4">Courses en attente</h2>
           <?php foreach ($pending_journeys as $j): ?>
             <div class="form-group">         
-              <button class="btn btn-info btn-lg" href="#" ><?php format_journey($j); ?></a>
+              <button class="btn btn-info btn-default" href="#" ><?php format_journey($j); ?></a>
             </div>
           <?php endforeach; ?>
           </div>
@@ -81,19 +84,29 @@ header("Cache-Control: max-age=0");
           <h2 class="h4">Courses en cours</h2>
           <?php foreach ($inprogress_journeys as $j): ?>
             <div class="form-group">         
-              <button class="btn btn-success btn-lg" href="#" ><?php format_journey($j); ?></a>
+              <button class="btn btn-success btn-default" href="#" ><?php format_journey($j); ?></a>
             </div>
           <?php endforeach; ?>
           </div>
 
         </div>
-        <a class="btn btn-info bt-sm"  href="history">Historique</a>
+
     </div>
 
-    <div class="container">
-        <div class="row">
 
-          <div class="col-sm-3 col-lg-3">
+
+<div id="addJourney" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Ajouter une course</h4>
+      </div>
+      <div class="modal-body">
+
+
         <div class="form-group">      
           <label>Client :</label> <input id="client" type="text" class="form-control"></input>
         </div>
@@ -126,12 +139,20 @@ header("Cache-Control: max-age=0");
         </div>
 
 
-        <div class="btn-group">
-          <button class="btn btn-info bt-sm"  href="#" onclick="event.target.disabled=true;click_add_journey();">Ajouter</button>
-        </div>  
-          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal"  href="#" onclick="event.target.disabled=true;click_add_journey();">Ajouter</button>
+        </div>    
 
-        </div>      
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+    <div class="container">
     </div>
     <script src="<?php echo base_url("assets/js/jquery.min.js"); ?>"></script>
     <script src="<?php echo base_url("assets/js/bootstrap.min.js"); ?>"></script>
