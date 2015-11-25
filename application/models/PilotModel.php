@@ -44,7 +44,7 @@ class PilotModel extends CI_Model {
     Add functions
   */
 
-  public function add_journey($customer_name, $start_addr, $destination_addr, $start_time ){
+  public function add_journey($customer_name, $start_addr, $destination_addr, $start_time, $state ){
     $this->db->insert('tw_customers', array('first_name' => $customer_name));
     $customer_id = $this->db->insert_id();
 
@@ -56,7 +56,7 @@ class PilotModel extends CI_Model {
 
     $data =  array(
       'bicycle_id' => $this->id, 
-      'state' => 0, 
+      'state' => $state, 
       'customer_id' => $customer_id,
       'start_address_id' => $start_address_id,
       'destination_address_id' => $destination_address_id, 

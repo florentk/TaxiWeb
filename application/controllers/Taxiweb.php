@@ -123,8 +123,9 @@ class Taxiweb extends CI_Controller {
     && key_exists("start_addr",$in)
     && key_exists("destination_addr",$in)
     && key_exists("start_time",$in)
+    && key_exists("state",$in)
     ){   
-      if($this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time))))
+      if($this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)), $in->state))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);

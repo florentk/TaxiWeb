@@ -89,6 +89,16 @@
       });
     }
 
+    function add_journey(state, reload) {
+      api({"f" : "addJourney", 
+     "customer_name" : $('input#client').val(), 
+     "start_addr" : $('input#depart').val(), 
+     "destination_addr" : $('input#arrivee').val(), 
+     "start_time" : $('input#heure').val(),
+     "state" : state
+        },reload);
+    }
+
     function click_journey(journey_id) {
       //TODO test field not null
       if(confirm("Commencer la course ?"))
@@ -104,7 +114,7 @@
     function click_end_journey(new_journey) {
       if(confirm("Terminer la course ?")){
         if(new_journey) 
-          location.reload(true);    
+          add_journey(3,true);   
         else  
           api({"f" : "endCurrentJourney"},true);
       }
@@ -112,12 +122,7 @@
 
     function click_pending_journey(new_journey) {
       if(new_journey)
-        api({"f" : "addJourney", 
-             "customer_name" : $('input#client').val(), 
-             "start_addr" : $('input#depart').val(), 
-             "destination_addr" : $('input#arrivee').val(), 
-             "start_time" : $('input#heure').val()
-        },true);
+        add_journey(0,true);
       else
         api({"f" : "pendingCurrentJourney"},true);
     }
