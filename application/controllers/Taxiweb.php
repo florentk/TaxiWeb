@@ -31,11 +31,12 @@ class Taxiweb extends CI_Controller {
 	private function manager_full($data)
 	{
     $data['title'] = 'Manager';
-    $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
     $date_add_journey['prefix_class'] = "modal";
+    $date_add_journey['main_class'] = "modal fade";
 
 		$this->load->view('templates/header',$data);
     $this->load->view('manager/bicycles',$data);
+    $this->load->view('manager/buttons',$data);
     $this->load->view('manager/journeys',$data);
     $this->load->view('manager/add_journeys',$date_add_journey);
 		$this->load->view('templates/footer');
@@ -46,6 +47,7 @@ class Taxiweb extends CI_Controller {
 	{
     $data['title'] = 'Ajouter une course';
     $date_add_journey['prefix_class'] = "form";
+    $date_add_journey['main_class'] = "form";
 
 		$this->load->view('templates/header',$data);
     $this->load->view('manager/add_journeys',$date_add_journey);
@@ -55,6 +57,7 @@ class Taxiweb extends CI_Controller {
 
   public function manager(){
     $this->detect = new Mobile_Detect;
+    $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
     $data['unaffected_journeys'] = $this->ManagerModel->get_unaffected_journeys();
     $data['pending_journeys'] = $this->ManagerModel->get_pending_journeys();
     $data['inprogress_journeys'] = $this->ManagerModel->get_inprogress_journeys();
