@@ -93,6 +93,24 @@ class Taxiweb extends CI_Controller {
     } 
    }
 
+
+  private function api_manager_add_journey($in) {
+    if(key_exists("customer_name",$in)
+    && key_exists("bicycle_id",$in)
+    && key_exists("start_addr",$in)
+    && key_exists("destination_addr",$in)
+    && key_exists("start_time",$in)
+    && key_exists("end_time",$in)
+    ){   
+      if($this->ManagerModel->add_journey(intval($in->bicycle_id),$in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)),date('Y-m-d H:i:s',strtotime($in->end_time))))
+        $this->api_ret_ok();
+      else
+        $this->api_ret_err(12,$in);
+    }else{
+      $this->api_ret_err(11,$in);
+    } 
+   }
+
   private function api_set_current_journey($in) {
     if(key_exists("id",$in)){
       if($this->PilotModel->end_current_journey() 
@@ -152,6 +170,8 @@ class Taxiweb extends CI_Controller {
         $this->api_end_current_journey();
       else if($in->f === "addJourney") 
         $this->api_add_journey($in);
+      else if($in->f === "managerAddJourney") 
+        $this->api_manager_add_journey($in);
       else    $this->api_ret_err(2,$in);
     }else $this->api_ret_err(1,$in);
   }

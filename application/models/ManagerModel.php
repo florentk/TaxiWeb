@@ -32,6 +32,29 @@ class ManagerModel extends CI_Model {
      return $query->result();
   }
 
+  public function add_journey($bicycle_id,$customer_name, $start_addr, $destination_addr, $start_time, $end_time ){
+    $this->db->insert('tw_customers', array('first_name' => $customer_name));
+    $customer_id = $this->db->insert_id();
+
+    $this->db->insert('tw_address', array('way' => $start_addr));
+    $start_address_id = $this->db->insert_id();
+
+    $this->db->insert('tw_address', array('way' => $destination_addr));
+    $destination_address_id = $this->db->insert_id();
+
+    $data =  array(
+      'bicycle_id' => $bicycle_id, 
+      'state' => 1, 
+      'customer_id' => $customer_id,
+      'start_address_id' => $start_address_id,
+      'destination_address_id' => $destination_address_id, 
+      'start_time' => $start_time,
+      'end_time' => $end_time
+    );
+
+    return $this->db->insert('tw_journey', $data);
+  }
+
 }
 ?>
 

@@ -40,15 +40,15 @@ header("Cache-Control: max-age=0");
             <div class="form-group">      
               <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
             </div>
-            <div class="form-group">
-              <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input> 
-          </div>
             <div class="form-group">  
               <label>Depart :</label> <input id="depart" type="text"  class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
           </div>
             <div class="form-group">       
               <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->destination."\"";  ?>"></input>
             </div>
+            <div class="form-group">
+              <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input> 
+          </div>
 
             <div class="form-group">
               <button class="btn btn-danger bt-sm"  href="#" onclick="event.target.disabled=true;click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
