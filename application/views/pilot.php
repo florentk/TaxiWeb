@@ -73,6 +73,9 @@
                <?php if ($state == 2) $attr="checked"; else $attr=""; ?>
               <input id="switch-dispo" type="checkbox" <?php echo $attr ; ?> data-size="large" data-on-color="danger" data-off-color="success" data-on-text="Occupé" data-off-text="Libre">
             </div>
+            <div class="form-group">         
+              <button class="btn btn-info btn-lg" href="#" onclick="click_exit();">Quitter</a>
+            </div>
           </div>
 
       </div>
@@ -127,7 +130,9 @@
         api({"f" : "pendingCurrentJourney"},true);
     }
 
-    
+    function click_exit() {
+        api({"f" : "unsetBicycleId"},true);
+    }    
 
     function updatePos(){
       navigator.geolocation.getCurrentPosition(function(position) {

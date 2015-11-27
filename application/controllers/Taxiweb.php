@@ -10,22 +10,40 @@ class Taxiweb extends CI_Controller {
     $this->load->model('PilotModel');
     $this->load->model('ManagerModel');
     $this->load->library('Mobile_Detect');
+    $this->load->library('session');
+    
+  }
 
-    $this->PilotModel->init(1);
+  private function init_with_session(){
+    $bicycle_id = $this->session->userdata('bicycle_id');
+
+    if($bicycle_id) {
+      $this->PilotModel->init($bicycle_id);
+    }
+
+    return $bicycle_id;
   }
 
 	public function index()
 	{
-    $data['title'] = 'florent';
-    $data['name'] = 'florent';
-    $data['state'] = $this->PilotModel->get_pilot_state();
-    $data['pending_journeys'] = $this->PilotModel->get_pending_journeys();
-    $data['current_journey'] = $this->PilotModel->get_current_journey();
-    $data['request_journeys'] = $this->PilotModel->get_request_journeys();
+    if($bicycle_id=$this->init_with_session()) {
+      $data['title'] = 'pilot '.$bicycle_id;
+      $data['name'] = 'pilot '.$bicycle_id;
+      $data['state'] = $this->PilotModel->get_pilot_state();
+      $data['pending_journeys'] = $this->PilotModel->get_pending_journeys();
+      $data['current_journey'] = $this->PilotModel->get_current_journey();
+      $data['request_journeys'] = $this->PilotModel->get_request_journeys();
 
-		$this->load->view('templates/header',$data);
-		$this->load->view('pilot',$data);
-		$this->load->view('templates/footer');
+		  $this->load->view('templates/header',$data);
+		  $this->load->view('pilot',$data);
+		  $this->load->view('templates/footer');
+
+    }else {
+      $data['title'] = 'Identification';
+		  $this->load->view('templates/header',$data);
+		  $this->load->view('identification',$data);
+		  $this->load->view('templates/footer');      
+    }
 	}
 
 	private function manager_full($data)
@@ -98,7 +116,8 @@ class Taxiweb extends CI_Controller {
   private function api_set_pos($in) {
     
     if(key_exists("lat",$in) && key_exists("long",$in)){
-      if($this->PilotModel->set_pilot_pos($in->lat,$in->long))
+      if($this->init_with_session() 
+      && $this->PilotModel->set_pilot_pos($in->lat,$in->long))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
@@ -107,9 +126,17 @@ class Taxiweb extends CI_Controller {
     }
   }
 
+  private function api_set_bicycle_id($in) {
+    if(key_exists("bicycle_id",$in)){
+      $this->session->set_userdata('bicycle_id', $in->bicycle_id);
+    }else{
+      $this->api_ret_err(11,$in);
+    }    
+  }
+
   private function api_set_pilot_state($in) {
     if(key_exists("state",$in)){
-      if($this->PilotModel->set_pilot_state($in->state))
+      if($this->init_with_session() && $this->PilotModel->set_pilot_state($in->state))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
@@ -125,7 +152,7 @@ class Taxiweb extends CI_Controller {
     && key_exists("start_time",$in)
     && key_exists("state",$in)
     ){   
-      if($this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)), $in->state))
+      if($this->init_with_session() && $this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)), $in->state))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
@@ -154,7 +181,8 @@ class Taxiweb extends CI_Controller {
 
   private function api_set_current_journey($in) {
     if(key_exists("id",$in)){
-      if($this->PilotModel->end_current_journey() 
+      if($this->init_with_session() 
+      && $this->PilotModel->end_current_journey() 
       && $this->PilotModel->set_current_journey($in->id) 
       && $this->PilotModel->set_pilot_state(2))
         $this->api_ret_ok();
@@ -167,7 +195,7 @@ class Taxiweb extends CI_Controller {
 
   private function api_confirm_journey($in) {
     if(key_exists("id",$in)){
-      if($this->PilotModel->confirm_journey($in->id) )
+      if($this->init_with_session() && $this->PilotModel->confirm_journey($in->id) )
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
@@ -177,7 +205,8 @@ class Taxiweb extends CI_Controller {
   }
 
   private function api_pending_current_journey() {
-    if($this->PilotModel->pending_current_journey() 
+    if($this->init_with_session() 
+    && $this->PilotModel->pending_current_journey() 
     && $this->PilotModel->set_pilot_state(1))
       $this->api_ret_ok();
     else
@@ -185,7 +214,8 @@ class Taxiweb extends CI_Controller {
   }
 
   private function api_end_current_journey() {
-    if($this->PilotModel->end_current_journey() 
+    if($this->init_with_session() 
+    && $this->PilotModel->end_current_journey() 
     && $this->PilotModel->set_pilot_state(1))
       $this->api_ret_ok();
     else
@@ -201,6 +231,10 @@ class Taxiweb extends CI_Controller {
         $this->api_set_pos($in);
       else if($in->f === "setPilotState") 
         $this->api_set_pilot_state($in);
+      else if($in->f === "setBicycleId") 
+        $this->api_set_bicycle_id($in);
+      else if($in->f === "unsetBicycleId") 
+        $this->session->unset_userdata('bicycle_id');
       else if($in->f === "confirmJourney") 
         $this->api_confirm_journey($in);
       else if($in->f === "setCurrentJourney") 
