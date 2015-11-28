@@ -27,8 +27,8 @@ class Taxiweb extends CI_Controller {
 	public function index()
 	{
     if($bicycle_id=$this->init_with_session()) {
-      $data['title'] = 'pilot '.$bicycle_id;
-      $data['name'] = 'pilot '.$bicycle_id;
+      $data['name'] = $this->PilotModel->get_pilot_name();
+      $data['title'] = $data['name'];
       $data['state'] = $this->PilotModel->get_pilot_state();
       $data['pending_journeys'] = $this->PilotModel->get_pending_journeys();
       $data['current_journey'] = $this->PilotModel->get_current_journey();
@@ -40,6 +40,8 @@ class Taxiweb extends CI_Controller {
 
     }else {
       $data['title'] = 'Identification';
+      $data['name'] = $this->session->userdata('pilot_name');
+      $data['bicycles'] = $this->ManagerModel->get_bicycle_states();
 		  $this->load->view('templates/header',$data);
 		  $this->load->view('identification',$data);
 		  $this->load->view('templates/footer');      
@@ -127,11 +129,23 @@ class Taxiweb extends CI_Controller {
   }
 
   private function api_set_bicycle_id($in) {
-    if(key_exists("bicycle_id",$in)){
+    if(key_exists("bicycle_id",$in) && key_exists("pilot_name",$in)){
       $this->session->set_userdata('bicycle_id', $in->bicycle_id);
+      $this->session->set_userdata('pilot_name', $in->pilot_name);
+      $this->PilotModel->init($in->bicycle_id);
+      $this->PilotModel->set_pilot_name($in->pilot_name);
+      $this->PilotModel->set_pilot_state(1);
+      $this->api_ret_ok();
     }else{
       $this->api_ret_err(11,$in);
     }    
+  }
+
+  private function api_unset_bicycle_id($in) {
+    $this->init_with_session();
+    $this->PilotModel->set_pilot_name(NULL);
+    $this->PilotModel->set_pilot_state(0);
+    $this->session->unset_userdata('bicycle_id');
   }
 
   private function api_set_pilot_state($in) {
@@ -234,7 +248,7 @@ class Taxiweb extends CI_Controller {
       else if($in->f === "setBicycleId") 
         $this->api_set_bicycle_id($in);
       else if($in->f === "unsetBicycleId") 
-        $this->session->unset_userdata('bicycle_id');
+        $this->api_unset_bicycle_id();
       else if($in->f === "confirmJourney") 
         $this->api_confirm_journey($in);
       else if($in->f === "setCurrentJourney") 

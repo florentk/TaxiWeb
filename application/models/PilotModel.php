@@ -19,6 +19,12 @@ class PilotModel extends CI_Model {
     Get fonctions
   */
 
+  public function get_pilot_name() {
+    $this->db->select("pilot");
+    $query = $this->db->get_where('tw_bicycle', array('bicycle_id' => $this->id));
+    return $query->row()->pilot;
+  }
+
   public function get_pilot_state() {
     $this->db->select("state");
     $query = $this->db->get_where('tw_bicycle', array('bicycle_id' => $this->id));

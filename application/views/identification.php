@@ -9,12 +9,19 @@
         <div class="row">
           <div class="col-sm-4 col-lg-4">
 
-
-
-
             <div class="form-group">      
-              <label>Bicycle id :</label> <input id="bicycle_id" type="text" class="form-control"></input>
+              <label>Nom du pilote :</label> <input id="pilot_name" type="text" class="form-control" value="<?php echo $name; ?>"></input>
+            </div>
 
+            <div class="form-group">
+              <label >Nom du vélo :</label>
+              <select class="form-control" id="bicycle_id">
+                <?php foreach ($bicycles as $b): ?>
+                  <?php if ($b->state === "garage"): ?>
+                    <option value="<?php echo $b->num; ?>"><?php echo $b->num;  ?></option>
+                  <?php endif ?>
+                <?php endforeach; ?>
+              </select>
             </div>
 
             <div class="form-group">
@@ -35,9 +42,27 @@
   }
 
   function click_identification() {
-    api({"f" : "setBicycleId", "bicycle_id": $('input#bicycle_id').val()},true);
+    api({ "f" : "setBicycleId", 
+          "bicycle_id": $('select#bicycle_id').val(),
+          "pilot_name": $('input#pilot_name').val()
+    },true);
   }
 
-  
+   function submitenter(myfield,e) { 
+      var keycode; 
+
+      if (window.event) 
+        keycode = window.event.keyCode; 
+      else if (e) 
+        keycode = e.which; 
+      else 
+        return true; 
+
+      if (keycode == 13) {  
+        click_identification(); 
+        return false; 
+      } else 
+        return true; 
+   }
 
 </script>
