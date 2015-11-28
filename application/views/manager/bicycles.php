@@ -8,9 +8,10 @@
 
     <div class="container">
         <div class="row">
-          <div class="col-sm-3 col-lg-3">
+
 
           <?php foreach ($bicycles as $b): ?>
+          <div class="col-sm-3 col-lg-3">
             <div class="<?php echo "panel ".$panelcls[$b->state] ;?>">
               <div class="panel-heading">
                 <h3 class="panel-title"><?php echo "Vélo ".$b->num; ?></h3>
@@ -21,9 +22,8 @@
                 <h4># courses en attente</h4>
               </div>
             </div>
-          <?php endforeach; ?>
-
           </div>
+          <?php endforeach; ?>
         </div>
     </div>
 
