@@ -204,6 +204,15 @@ class Taxiweb extends CI_Controller {
     } 
   }
 
+  private function api_manager_garage($in) {
+    if(key_exists("id",$in)) {
+      $this->ManagerModel->garage($in->id);
+      $this->api_ret_ok();
+    }else{
+      $this->api_ret_err(11,$in);
+    } 
+  }
+
   private function api_manager_affecte_journey($in) {
     if(key_exists("id",$in) 
     && key_exists("bicycle_id",$in)
@@ -287,6 +296,8 @@ class Taxiweb extends CI_Controller {
         $this->api_manager_add_journey($in);
       else if($in->f === "affecteJourney") 
         $this->api_manager_affecte_journey($in);
+      else if($in->f === "garage") 
+        $this->api_manager_garage($in);
       else $this->api_ret_err(2,$in);
     }else $this->api_ret_err(1,$in);
   }

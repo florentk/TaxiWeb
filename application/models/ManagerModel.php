@@ -71,6 +71,14 @@ class ManagerModel extends CI_Model {
     ));
   }
 
+  public function garage($id){
+    $data =  array(
+      'state' => 0, 
+      'pilot' => ""
+    );
+    $this->set_pilot_data($id,$data);
+  }
+
   private function set_journey_state($journey_id, $state){
     $this->db->where('journey_id', $journey_id);
     return $this->db->update('tw_journey', array(
@@ -78,7 +86,10 @@ class ManagerModel extends CI_Model {
     ));
   }
 
-
+  private function set_pilot_data($id,$data) {
+    $this->db->where('bicycle_id', $id);
+    return $this->db->update('tw_bicycle', $data);
+  }
 
 
 }

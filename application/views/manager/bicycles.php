@@ -15,18 +15,32 @@
           <div class="col-sm-3 col-lg-3">
             <div class="<?php echo "panel ".$panelcls[$b->state] ;?>">
               <div class="panel-heading">
-                <h3 class="panel-title"><?php echo "Vélo ".$b->num; ?></h3>
+                <h3 class="panel-title"><?php echo "Vélo ".$b->num; ?> <span onclick="click_garage(<?php echo $b->bicycle_id; ?>)" class='glyphicon glyphicon-home'/></h3>
               </div>
               <div class="panel-body">
                 <h4><b><?php if ($b->pilot == "") echo $b->state; else echo $b->pilot." - ".$b->state; ?></b></h4>
-                <h4><?php echo $b->latitude." ".$b->longitude; ?></h4>
+                <h4><?php echo "<a href='http://www.openstreetmap.org/?mlat=$b->latitude&mlon=$b->longitude&zoom=16'> $b->latitude $b->longitude </a></h4>"; ?>
                 <h4><?php echo $b->nb_progress_journey; ?> courses en attente</h4>
+
+
+
+
+
               </div>
             </div>
           </div>
           <?php endforeach; ?>
         </div>
     </div>
+
+  <script>
+  function click_garage(id) {
+      api({"f" : "garage", 
+           "id" : id
+      },true);
+  }
+
+</script>
 <!--
   <div id="mapdiv"></div>
   <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
