@@ -84,12 +84,12 @@
 
   function click_add_journey() {
       api({"f" : "managerAddJourney", 
-           "bicycle_id" : $('select#affectation').val(), 
-           "customer_name" : $('input#client').val(), 
-           "start_addr" : $('input#depart').val(), 
-           "destination_addr" : $('input#arrivee').val(), 
-           "start_time" : $('input#heure_depart').val(),
-           "end_time" : $('input#heure_arrivee').val()
+           "bicycle_id" : $('#addJourney select#affectation').val(), 
+           "customer_name" : $('#addJourney input#client').val(), 
+           "start_addr" : $('#addJourney input#depart').val(), 
+           "destination_addr" : $('#addJourney input#arrivee').val(), 
+           "start_time" : $('#addJourney input#heure_depart').val(),
+           "end_time" : $('#addJourney input#heure_arrivee').val()
       },true);
   }
 

@@ -59,6 +59,7 @@ class Taxiweb extends CI_Controller {
     $this->load->view('manager/buttons',$data);
     $this->load->view('manager/journeys',$data);
     $this->load->view('manager/add_journeys',$date_add_journey);
+    $this->load->view('manager/update_journeys',$date_add_journey);
 		$this->load->view('templates/footer');
   } 
 
@@ -71,6 +72,7 @@ class Taxiweb extends CI_Controller {
 
 		$this->load->view('templates/header',$data);
     $this->load->view('manager/add_journeys',$date_add_journey);
+    $this->load->view('manager/update_journeys',$date_add_journey);
     $this->load->view('manager/journeys',$data);
 		$this->load->view('templates/footer');
   } 
@@ -105,7 +107,7 @@ class Taxiweb extends CI_Controller {
       $this->output
               ->set_content_type('application/json')
               ->set_status_header(400)
-              ->set_output(json_encode(array('status' => "Err",'code' => $code,'debug' => $debug))."\n");
+              ->set_output(json_encode(array('status' => "Err",'code' => $code,'err'=>$this->db->error(),'req' => $debug))."\n");
   }
 
   private function api_ret_ok() {
@@ -193,6 +195,27 @@ class Taxiweb extends CI_Controller {
     } 
    }
 
+  private function api_manager_end_journey($in) {
+    if(key_exists("id",$in)) {
+      $this->ManagerModel->end_journey($in->id);
+      $this->api_ret_ok();
+    }else{
+      $this->api_ret_err(11,$in);
+    } 
+  }
+
+  private function api_manager_affecte_journey($in) {
+    if(key_exists("id",$in) 
+    && key_exists("bicycle_id",$in)
+    ) {
+      $this->ManagerModel->affecte_journey($in->id,$in->bicycle_id);
+      $this->api_ret_ok();
+    }else{
+      $this->api_ret_err(11,$in);
+    } 
+  }
+
+
   private function api_set_current_journey($in) {
     if(key_exists("id",$in)){
       if($this->init_with_session() 
@@ -236,7 +259,6 @@ class Taxiweb extends CI_Controller {
       $this->api_ret_err(12,""); 
   }
 
-
   public function api() {
     $in = json_decode($this->input->post('req'));
 
@@ -257,11 +279,15 @@ class Taxiweb extends CI_Controller {
         $this->api_pending_current_journey();
       else if($in->f === "endCurrentJourney") 
         $this->api_end_current_journey();
+      else if($in->f === "managerEndJourney") 
+        $this->api_manager_end_journey($in);
       else if($in->f === "addJourney") 
         $this->api_add_journey($in);
       else if($in->f === "managerAddJourney") 
         $this->api_manager_add_journey($in);
-      else    $this->api_ret_err(2,$in);
+      else if($in->f === "affecteJourney") 
+        $this->api_manager_affecte_journey($in);
+      else $this->api_ret_err(2,$in);
     }else $this->api_ret_err(1,$in);
   }
 
