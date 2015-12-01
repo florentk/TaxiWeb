@@ -42,6 +42,9 @@ class ManagerModel extends CI_Model {
     $this->db->insert('tw_address', array('way' => $destination_addr));
     $destination_address_id = $this->db->insert_id();
 
+    if ($bicycle_id == 0)
+      $bicycle_id = NULL;
+
     $data =  array(
       'bicycle_id' => $bicycle_id, 
       'state' => 1, 

@@ -18,7 +18,7 @@
                 <h3 class="panel-title"><?php echo "Vélo ".$b->num; ?></h3>
               </div>
               <div class="panel-body">
-                <h4><b><?php echo $b->pilot." - ".$b->state; ?></b></h4>
+                <h4><b><?php if ($b->pilot == "") echo $b->state; else echo $b->pilot." - ".$b->state; ?></b></h4>
                 <h4><?php echo $b->latitude." ".$b->longitude; ?></h4>
                 <h4><?php echo $b->nb_progress_journey; ?> courses en attente</h4>
               </div>
