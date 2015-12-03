@@ -107,7 +107,7 @@ class Taxiweb extends CI_Controller {
   private function api_ret_err($code, $debug) {
       $this->output
               ->set_content_type('application/json')
-              ->set_status_header(400)
+              ->set_status_header(200)
               ->set_output(json_encode(array('status' => "Err",'code' => $code,'err'=>$this->db->error(),'req' => $debug))."\n");
   }
 
