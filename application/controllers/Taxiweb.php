@@ -17,9 +17,10 @@ class Taxiweb extends CI_Controller {
   private function init_with_session(){
     $bicycle_id = $this->session->userdata('bicycle_id');
 
-    if($bicycle_id) {
+    if($bicycle_id && !$this->ManagerModel->is_garage($bicycle_id)) {
       $this->PilotModel->init($bicycle_id);
-    }
+    }else
+      return FALSE;
 
     return $bicycle_id;
   }
@@ -131,12 +132,14 @@ class Taxiweb extends CI_Controller {
   }
 
   private function api_set_bicycle_id($in) {
-    if(key_exists("bicycle_id",$in) && key_exists("pilot_name",$in)){
+    if(key_exists("bicycle_id",$in) 
+    && key_exists("pilot_name",$in) 
+    && $this->ManagerModel->is_garage($in->bicycle_id)){
+      $this->PilotModel->init($in->bicycle_id);
+      $this->PilotModel->set_pilot_state(1);
+      $this->PilotModel->set_pilot_name($in->pilot_name);
       $this->session->set_userdata('bicycle_id', $in->bicycle_id);
       $this->session->set_userdata('pilot_name', $in->pilot_name);
-      $this->PilotModel->init($in->bicycle_id);
-      $this->PilotModel->set_pilot_name($in->pilot_name);
-      $this->PilotModel->set_pilot_state(1);
       $this->api_ret_ok();
     }else{
       $this->api_ret_err(11,$in);

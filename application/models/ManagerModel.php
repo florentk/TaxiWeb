@@ -74,9 +74,16 @@ class ManagerModel extends CI_Model {
   public function garage($id){
     $data =  array(
       'state' => 0, 
-      'pilot' => ""
+      'pilot' => NULL
     );
     $this->set_pilot_data($id,$data);
+  }
+
+  public function is_garage($id){
+    $this->db->where('bicycle_id', $id);
+    $this->db->where('state', 0);
+    $query = $this->db->get('tw_bicycle');
+    return $query->num_rows() === 1;
   }
 
   private function set_journey_state($journey_id, $state){
