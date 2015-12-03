@@ -23,19 +23,20 @@
             <div class="form-group">      
               <label>Client :</label> <input id="client" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->client."\""; ?> ></input>
             </div>
+            <div class="form-group">
+              <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input> 
+          </div>
             <div class="form-group">  
-              <label>Depart :</label> <input id="depart" type="text"  class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
+              <label>Depart :</label> <input id="depart" type="text"  class="form-control" onkeyup="document.getElementById('pendding_button').disabled = (event.target.value.length == 0);" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->start."\"";  ?>"></input>
           </div>
             <div class="form-group">       
               <label>Arrivée :</label> <input id="arrivee" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".$current_journey->destination."\"";  ?>"></input>
             </div>
-            <div class="form-group">
-              <label>Heure :</label> <input id="heure" type="text" class="form-control" <?php if($current_journey!=null) echo "disabled value=\"".date_format(date_create($current_journey->start_time), 'H:i')."\"";  ?>"></input> 
-          </div>
+
 
             <div class="form-group">
-              <button class="btn btn-danger bt-sm"  href="#" onclick="event.target.disabled=true;click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
-              <button class="btn btn-info bt-sm"  href="#" onclick="event.target.disabled=true;click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
+              <button class="btn btn-danger bt-sm"  href="#" onclick="click_end_journey(<?php echo $current_journey==null ;?>)">Terminer la course</button>  
+              <button class="btn btn-info bt-sm" id="pendding_button"  href="#" disabled onclick="disable_button_temporaly(event.target);click_pending_journey(<?php echo $current_journey==null ;?>)">Mettre en attente</button>
             </div>
 
           </div>
@@ -46,7 +47,7 @@
             <?php foreach ($pending_journeys as $j): ?>
 
             <div class="form-group">         
-              <button class="btn btn-info btn-lg" href="#" onclick="event.target.disabled=true;click_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
+              <button class="btn btn-info btn-lg" href="#" onclick="click_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
             </div>
 
             <?php endforeach; ?>
@@ -60,7 +61,7 @@
             <?php foreach ($request_journeys as $j): ?>
 
             <div class="form-group">         
-              <button class="btn btn-danger btn-lg" href="#" onclick="event.target.disabled=true;click_confirm_journey(<?php echo $j->journey_id ;?>)"><?php format_journey($j); ?></a>
+              <button class="btn btn-danger btn-lg" href="#" onclick="click_confirm_journey(<?php echo $j->journey_id ;?>)" ><?php format_journey($j); ?></a>
             </div>
 
             <?php endforeach; ?>
@@ -88,7 +89,8 @@
 
     function api(jreq,reload) {
       $.post("index.php/api",{req : JSON.stringify(jreq) }, function(data, status){
-        if(reload) location.reload(true);
+        if((status == "success") && reload) 
+          location.reload(true);
       });
     }
 
@@ -101,6 +103,11 @@
      "state" : state
         },reload);
     }
+
+    function disable_button_temporaly(elt){
+      elt.disabled=true;
+      setTimeout(function(){elt.disabled=false; }, 5000);
+     }
 
     function click_journey(journey_id) {
       //TODO test field not null

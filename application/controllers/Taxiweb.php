@@ -161,6 +161,15 @@ class Taxiweb extends CI_Controller {
     }    
   }
 
+  private function decode_date($str) {
+    if ($str === '') return NULL;
+    $t = strtotime($str);
+    if($t===FALSE)
+      return NULL;
+    else
+      return date('Y-m-d H:i:s',$t);
+  }
+
   private function api_add_journey($in) {
     if(key_exists("customer_name",$in)
     && key_exists("start_addr",$in)
@@ -168,7 +177,7 @@ class Taxiweb extends CI_Controller {
     && key_exists("start_time",$in)
     && key_exists("state",$in)
     ){   
-      if($this->init_with_session() && $this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)), $in->state))
+      if($this->init_with_session() && $this->PilotModel->add_journey($in->customer_name, $in->start_addr, $in->destination_addr,  $this->decode_date($in->start_time), $in->state))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
@@ -186,7 +195,7 @@ class Taxiweb extends CI_Controller {
     && key_exists("start_time",$in)
     && key_exists("end_time",$in)
     ){   
-      if($this->ManagerModel->add_journey(intval($in->bicycle_id),$in->customer_name, $in->start_addr, $in->destination_addr,  date('Y-m-d H:i:s',strtotime($in->start_time)),date('Y-m-d H:i:s',strtotime($in->end_time))))
+      if($this->ManagerModel->add_journey(intval($in->bicycle_id),$in->customer_name, $in->start_addr, $in->destination_addr,  $this->decode_date($in->start_time),$this->decode_date($in->end_time)))
         $this->api_ret_ok();
       else
         $this->api_ret_err(12,$in);
